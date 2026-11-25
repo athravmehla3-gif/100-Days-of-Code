@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+struct Item {
+    int id;
+    char name[30];
+    int price;
+    int stock;
+};
+
+struct Item menu[20];
+int totalItems = 0;
+int tokenNo = 100;
+
+void addDefaultItems() {
+    menu[0] = (struct Item){1, "Rajma Chawal", 60, 50};
+    menu[1] = (struct Item){2, "Chole Bhature", 70, 40};
+    menu[2] = (struct Item){3, "Veg Maggi", 40, 60};
+    menu[3] = (struct Item){4, "Cold Coffee", 50, 30};
+    menu[4] = (struct Item){5, "Samosa (2 pc)", 30, 100};
+    totalItems = 5;
+}
+
+void showMenu() {
+    printf("\n----- TODAY'S MENU -----\n");
+    printf("ID\tName\t\tPrice\tStock\n");
+    for (int i = 0; i < totalItems; i++) {
+        printf("%d\t%s\t\t%d\t%d\n", menu[i].id, menu[i].name, menu[i].price, menu[i].stock);
+    }
+}
+
+void placeOrder() {
+    showMenu();
+    int id, qty, total = 0;
+    char choice;
+    printf("\n--- Place Order ---\n");
+    do {
+        printf("Enter Item ID: ");
+        scanf("%d", &id);
+        printf("Enter Quantity: ");
+        scanf("%d", &qty);
+
+        int found = 0;
+        for (int i = 0; i < totalItems; i++) {
+            if (menu[i].id == id) {
+                found = 1;
+                if (menu[i].stock >= qty) {
+                    menu[i].stock -= qty;
+                    int cost = menu[i].price * qty;
+                    total += cost;
+                    printf("%s x %d = Rs.%d\n", menu[i].name, qty, cost);
+                } else {
+                    printf("Sorry! Only %d left in stock.\n", menu[i].stock);
+                }
+            }
+        }
+        if (!found) printf("Invalid ID!\n");
+
+        printf("Add more? (y/n): ");
+        scanf(" %c", &choice);
+    } while (choice == 'y' || choice == 'Y');
+
+    tokenNo++;
+    printf("\n=========================\n");
+    printf("Order Successful!\n");
+    printf("Your Token No: %d\n", tokenNo);
+    printf("Total Bill: Rs.%d\n", total);
+    printf("Please show token at counter.\n");
+    printf("=========================\n");
+}
+
+void adminPanel() {
+    int pass;
+    printf("Enter Admin Password (1234): ");
+    scanf("%d", &pass);
+    if (pass != 1234) {
+        printf("Wrong Password!\n");
+        return;
+    }
+    printf("\n--- ADMIN DASHBOARD ---\n");
+    showMenu();
+    printf("\n1. Add New Item\n");
+    printf("Enter Name, Price, Stock: ");
+    char name[30];
+    int price, stock;
+    scanf("%s %d %d", name, &price, &stock);
+    totalItems++;
+    menu[totalItems-1].id = totalItems;
+    strcpy(menu[totalItems-1].name, name);
+    menu[totalItems-1].price = price;
+    menu[totalItems-1].stock = stock;
+    printf("Item Added Successfully!\n");
+}
+
+int main() {
+    addDefaultItems();
+    int ch;
+    printf("Welcome to Smart Canteen Management System\n");
+    while (1) {
+        printf("\n1. Show Menu\n2. Place Order\n3. Admin Panel\n4. Exit\n");
+        printf("Enter Choice: ");
+        scanf("%d", &ch);
+        if (ch == 1) showMenu();
+        else if (ch == 2) placeOrder();
+        else if (ch == 3) adminPanel();
+        else if (ch == 4) {
+            printf("Thank You! Visit Again.\n");
+            break;
+        }
+        else printf("Invalid Choice!\n");
+    }
+    return 0;
+}
